@@ -3,36 +3,41 @@ use itertools::Itertools;
 advent_of_code::solution!(2);
 
 pub fn part_one(input: &str) -> Option<u32> {
-    Some(input.lines().map(|line| {
-        let mut increasing = false;
-        let mut decreasing = false;
-        let windows = line.split_whitespace()
-            .map(|c| c.parse::<i32>().unwrap())
-            .tuple_windows();
-        for (a, b) in windows {
-            if a - b >= 1 && a-b < 4 {
-                if increasing {
+    Some(
+        input
+            .lines()
+            .map(|line| {
+                let mut increasing = false;
+                let mut decreasing = false;
+                let windows = line
+                    .split_whitespace()
+                    .map(|c| c.parse::<i32>().unwrap())
+                    .tuple_windows();
+                for (a, b) in windows {
+                    if a - b >= 1 && a - b < 4 {
+                        if increasing {
+                            return 0;
+                        } else {
+                            decreasing = true;
+                            continue;
+                        }
+                    } else if a - b <= -1 && a - b > -4 {
+                        if decreasing {
+                            return 0;
+                        } else {
+                            increasing = true;
+                            continue;
+                        }
+                    }
                     return 0;
-                } else {
-                    decreasing = true;
-                    continue;
                 }
-            } else if a - b <= -1 && a-b > -4 {
-                if decreasing {
-                    return 0;
-                } else {
-                    increasing = true;
-                    continue;
-                }
-            }
-            return 0;
-        }
-        return 1;
-    }).sum())
+                1
+            })
+            .sum(),
+    )
 }
 
 fn is_line_safe(line: &Vec<&i32>) -> bool {
-
     let mut increasing = false;
     let mut decreasing = false;
     for (a, b) in line.iter().tuple_windows() {
@@ -71,7 +76,7 @@ pub fn part_two(input: &str) -> Option<u32> {
                         return 1;
                     }
                 }
-                return 0;
+                0
             })
             .sum(),
     )

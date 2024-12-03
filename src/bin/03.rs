@@ -4,22 +4,31 @@ advent_of_code::solution!(3);
 
 pub fn part_one(input: &str) -> Option<u32> {
     let pattern = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)").unwrap();
-    Some(pattern.captures_iter(input).map(|c| c.extract()).map(|(_, [a, b])| {
-        a.parse::<u32>().unwrap() * b.parse::<u32>().unwrap()
-    }).sum())
+    Some(
+        pattern
+            .captures_iter(input)
+            .map(|c| c.extract())
+            .map(|(_, [a, b])| a.parse::<u32>().unwrap() * b.parse::<u32>().unwrap())
+            .sum(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let pattern = Regex::new(r"mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)").unwrap();
     let mut should_do = true;
     let mut accum = 0;
-    pattern.captures_iter(input).for_each(|c| {
-        match c.get(0).unwrap().as_str() {
+    pattern
+        .captures_iter(input)
+        .for_each(|c| match c.get(0).unwrap().as_str() {
             "do()" => should_do = true,
             "don't()" => should_do = false,
-            _ => if should_do { accum += c.get(1).unwrap().as_str().parse::<u32>().unwrap() * c.get(2).unwrap().as_str().parse::<u32>().unwrap() },
-        }
-    });
+            _ => {
+                if should_do {
+                    accum += c.get(1).unwrap().as_str().parse::<u32>().unwrap()
+                        * c.get(2).unwrap().as_str().parse::<u32>().unwrap()
+                }
+            }
+        });
     Some(accum)
 }
 

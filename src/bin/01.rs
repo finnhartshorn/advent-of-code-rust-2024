@@ -12,7 +12,13 @@ pub fn part_one(input: &str) -> Option<u32> {
     });
     list_1.sort();
     list_2.sort();
-    Some(list_1.iter().zip(list_2.iter()).map(|(a, b)| a.abs_diff(*b)).sum())
+    Some(
+        list_1
+            .iter()
+            .zip(list_2.iter())
+            .map(|(a, b)| a.abs_diff(*b))
+            .sum(),
+    )
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
@@ -21,7 +27,10 @@ pub fn part_two(input: &str) -> Option<u32> {
     input.lines().for_each(|line| {
         let mut parts = line.split("   ");
         list_1.push(parts.next().unwrap().parse::<u32>().unwrap());
-        counts.entry(parts.next().unwrap().parse::<u32>().unwrap()).and_modify(|e| *e += 1).or_insert(1);
+        counts
+            .entry(parts.next().unwrap().parse::<u32>().unwrap())
+            .and_modify(|e| *e += 1)
+            .or_insert(1);
     });
     Some(list_1.iter().map(|a| a * counts.get(a).unwrap_or(&0)).sum())
 }
