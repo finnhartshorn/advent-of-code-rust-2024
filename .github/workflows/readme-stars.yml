@@ -1,7 +1,8 @@
 name: Update readme ⭐️ progress
 
 on:
-    push
+    push:
+    workflow_dispatch:
 
 jobs:
     update-readme:
