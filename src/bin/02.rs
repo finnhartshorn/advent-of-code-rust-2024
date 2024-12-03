@@ -37,7 +37,7 @@ pub fn part_one(input: &str) -> Option<u32> {
     )
 }
 
-fn is_line_safe(line: &Vec<&i32>) -> bool {
+fn is_line_safe(line: &[&i32]) -> bool {
     let mut increasing = false;
     let mut decreasing = false;
     for (a, b) in line.iter().tuple_windows() {
