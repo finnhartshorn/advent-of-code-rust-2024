@@ -16,7 +16,7 @@ pub fn part_one(input: &str) -> Option<u32> {
         let pages: Vec<u32> = line.split(',').map(|n| n.parse::<u32>().unwrap()).collect();
         for i in 1..pages.len() {
             let Some(conflict_set) = before_map.get(&pages[i]) else {
-                continue
+                continue;
             };
             for page in pages.iter().take(i) {
                 if conflict_set.contains(page) {
@@ -44,7 +44,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         let mut pages: Vec<u32> = line.split(',').map(|n| n.parse::<u32>().unwrap()).collect();
         for mut _i in 1..pages.len() {
             let Some(conflict_set) = before_map.get(&pages[_i]) else {
-                continue
+                continue;
             };
             let current_index = _i;
             for j in 0..current_index {
