@@ -18,8 +18,8 @@ pub fn part_one(input: &str) -> Option<u32> {
             let Some(conflict_set) = before_map.get(&pages[i]) else {
                 continue
             };
-            for j in 0..i {
-                if conflict_set.contains(&pages[j]) {
+            for page in pages.iter().take(i) {
+                if conflict_set.contains(page) {
                     continue 'outer;
                 }
             }
@@ -42,21 +42,21 @@ pub fn part_two(input: &str) -> Option<u32> {
     for line in splitter.next()?.lines() {
         let mut fixed = false;
         let mut pages: Vec<u32> = line.split(',').map(|n| n.parse::<u32>().unwrap()).collect();
-        let mut i = 1;
-        while i < pages.len() {
-            let Some(conflict_set) = before_map.get(&pages[i]) else {
+        for mut _i in 1..pages.len() {
+            let Some(conflict_set) = before_map.get(&pages[_i]) else {
                 continue
             };
-            for j in 0..i {
+            let current_index = _i;
+            for j in 0..current_index {
                 if conflict_set.contains(&pages[j]) {
-                    let element = pages.remove(i);
+                    let element = pages.remove(_i);
                     pages.insert(j, element);
-                    i = j;
+                    _i = if j > 0 { j - 1 } else { 0 };
                     fixed = true;
                     break;
                 }
             }
-            i += 1;
+            // i += 1;
         }
         if fixed {
             sum += pages[(pages.len()) / 2]
