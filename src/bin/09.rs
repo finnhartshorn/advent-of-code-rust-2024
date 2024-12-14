@@ -67,8 +67,74 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(sum)
 }
 
-pub fn part_two(_input: &str) -> Option<u32> {
-    None
+#[derive(Debug)]
+struct Section {
+    position: u32,
+    size: u32,
+    id: u32,
+}
+
+impl Section {
+    fn checksum(&self) -> u64 {
+        (0..self.size)
+            .map(|n| (self.position + n) as u64 * self.id as u64)
+            .sum()
+    }
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    let mut spaces: Vec<Section> = Vec::new();
+    let mut files: Vec<Section> = Vec::new();
+    let mut state = State::File;
+    let mut id = 0;
+    let mut i = 0;
+    input.lines().next().unwrap().chars().for_each(|c| {
+        let size = c.to_digit(10).unwrap();
+        if size == 0 {
+            state = state.next();
+            return;
+        }
+        match state {
+            State::File => {
+                files.push(Section {
+                    position: i,
+                    id,
+                    size,
+                });
+                id += 1;
+            }
+            State::Free => {
+                spaces.push(Section {
+                    position: i,
+                    id,
+                    size,
+                });
+            }
+        }
+        state = state.next();
+        i += size;
+    });
+    let mut sum: u64 = 0;
+    'outer: while let Some(mut file) = files.pop() {
+        let spaces_len = spaces.len();
+        for i in 0..spaces_len {
+            if spaces[i].position > file.position {
+                break;
+            }
+            if spaces[i].size >= file.size {
+                spaces[i].size -= file.size;
+                file.position = spaces[i].position;
+                spaces[i].position += file.size;
+                sum += file.checksum();
+                if spaces[i].size == 0 {
+                    spaces.remove(i);
+                }
+                continue 'outer;
+            }
+        }
+        sum += file.checksum();
+    }
+    Some(sum)
 }
 
 #[cfg(test)]
