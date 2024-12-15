@@ -12,8 +12,6 @@ struct Game {
 
 impl Game {
     fn solve_machine(&self, offset: i64) -> u64 {
-        // let a_presses = (self.b_x_step * (self.y_target + offset) - self.b_y_step * (self.x_target + offset)) /
-        //     (self.b_x_step * self.a_y_step - self.b_y_step * self.a_x_step);
         let a_part1 =
             self.b_x_step * (self.y_target + offset) - self.b_y_step * (self.x_target + offset);
         let a_part2 = self.b_x_step * self.a_y_step - self.b_y_step * self.a_x_step;
@@ -33,18 +31,6 @@ impl Game {
         } else {
             0
         }
-
-        // let prize = (self.x_target + offset, self.y_target + offset);
-        // let det = self.a_x_step * self.b_y_step - self.a_y_step * self.a_x_step;
-        // let a = (prize.1 * self.b_y_step - prize.0 * self.a_x_step) / det;
-        // let b = (self.a_x_step * prize.0 - self.a_y_step * prize.1) / det;
-        // println!("a: {}, b: {}", a, b);
-        // if (self.a_x_step * a + self.a_x_step * b, self.a_y_step * a + self.b_y_step * b) == (prize.0, prize.1) {
-        //     (a * 3 + b) as u32
-        // } else {
-        //     0
-        // }
-        // 0
     }
 }
 
