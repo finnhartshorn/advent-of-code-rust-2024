@@ -54,3 +54,12 @@ pub fn get_all_directions(
     }
     results
 }
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
