@@ -1,13 +1,15 @@
-use std::collections::{HashSet, HashMap};
+use advent_of_code::Direction;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
-use advent_of_code::Direction;
+use std::collections::{HashMap, HashSet};
 
 advent_of_code::solution!(16);
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        other.cost.cmp(&self.cost)
+        other
+            .cost
+            .cmp(&self.cost)
             .then_with(|| self.x.cmp(&other.x).then_with(|| self.y.cmp(&other.y)))
     }
 }
@@ -31,13 +33,25 @@ impl Node {
     fn new(x: usize, y: usize, cost: u32, direction: Direction) -> Self {
         let mut visited = HashSet::new();
         visited.insert((x, y));
-        Node { x, y, cost, direction, visited }
+        Node {
+            x,
+            y,
+            cost,
+            direction,
+            visited,
+        }
     }
 
     fn new_from_node(node: &Node, x: usize, y: usize, cost: u32, direction: Direction) -> Self {
         let mut visited = node.visited.clone();
         visited.insert((x, y));
-        Node { x, y, cost, direction, visited }
+        Node {
+            x,
+            y,
+            cost,
+            direction,
+            visited,
+        }
     }
 }
 
@@ -46,24 +60,29 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut heap = BinaryHeap::new();
     let mut visited = HashSet::new();
 
-    let grid = input.lines().enumerate().map(|(y, line)| {
-        line.chars().enumerate().map(|(x, c)| {
-            match c {
-                '.' => true,
-                '#' => false,
-                'S' => {
-                    heap.push(Node::new(x, y, 0, Direction::Right));
-                    visited.insert((x, y));
-                    true
-                },
-                'E' => {
-                    end = (x, y);
-                    true
-                },
-                _ => panic!("unexpected character"),
-            }
-        }).collect::<Vec<bool>>()
-    }).collect::<Vec<Vec<bool>>>();
+    let grid = input
+        .lines()
+        .enumerate()
+        .map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(|(x, c)| match c {
+                    '.' => true,
+                    '#' => false,
+                    'S' => {
+                        heap.push(Node::new(x, y, 0, Direction::Right));
+                        visited.insert((x, y));
+                        true
+                    }
+                    'E' => {
+                        end = (x, y);
+                        true
+                    }
+                    _ => panic!("unexpected character"),
+                })
+                .collect::<Vec<bool>>()
+        })
+        .collect::<Vec<Vec<bool>>>();
 
     while let Some(node) = heap.pop() {
         if (node.x, node.y) == end {
@@ -81,8 +100,12 @@ pub fn part_one(input: &str) -> Option<u32> {
             let mut cost = node.cost + 1;
             if node.direction != direction {
                 match (node.direction, direction) {
-                    (Direction::Up, Direction::Down) | (Direction::Down, Direction::Up) => cost += 2000,
-                    (Direction::Left, Direction::Right) | (Direction::Right, Direction::Left) => cost += 2000,
+                    (Direction::Up, Direction::Down) | (Direction::Down, Direction::Up) => {
+                        cost += 2000
+                    }
+                    (Direction::Left, Direction::Right) | (Direction::Right, Direction::Left) => {
+                        cost += 2000
+                    }
                     _ => cost += 1000,
                 }
             }
@@ -100,30 +123,35 @@ pub fn part_two(input: &str) -> Option<u32> {
     let mut heap = BinaryHeap::new();
     let mut visited = HashMap::new();
 
-    let grid = input.lines().enumerate().map(|(y, line)| {
-        line.chars().enumerate().map(|(x, c)| {
-            match c {
-                '.' => true,
-                '#' => false,
-                'S' => {
-                    heap.push(Node::new(x, y, 0, Direction::Right));
-                    visited.insert((x,y, Direction::Right), 0);
-                    true
-                },
-                'E' => {
-                    end = (x, y);
-                    true
-                },
-                _ => panic!("unexpected character"),
-            }
-        }).collect::<Vec<bool>>()
-    }).collect::<Vec<Vec<bool>>>();
+    let grid = input
+        .lines()
+        .enumerate()
+        .map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(|(x, c)| match c {
+                    '.' => true,
+                    '#' => false,
+                    'S' => {
+                        heap.push(Node::new(x, y, 0, Direction::Right));
+                        visited.insert((x, y, Direction::Right), 0);
+                        true
+                    }
+                    'E' => {
+                        end = (x, y);
+                        true
+                    }
+                    _ => panic!("unexpected character"),
+                })
+                .collect::<Vec<bool>>()
+        })
+        .collect::<Vec<Vec<bool>>>();
 
     let mut best_path = HashSet::new();
     let mut lowest_cost = u32::MAX;
 
     while let Some(node) = heap.pop() {
-        if (node.x, node.y) == end && node.cost <= lowest_cost{
+        if (node.x, node.y) == end && node.cost <= lowest_cost {
             lowest_cost = node.cost;
             best_path.extend(node.visited.clone());
         }
@@ -139,8 +167,12 @@ pub fn part_two(input: &str) -> Option<u32> {
             let mut cost = node.cost + 1;
             if node.direction != direction {
                 match (node.direction, direction) {
-                    (Direction::Up, Direction::Down) | (Direction::Down, Direction::Up) => cost += 2000,
-                    (Direction::Left, Direction::Right) | (Direction::Right, Direction::Left) => cost += 2000,
+                    (Direction::Up, Direction::Down) | (Direction::Down, Direction::Up) => {
+                        cost += 2000
+                    }
+                    (Direction::Left, Direction::Right) | (Direction::Right, Direction::Left) => {
+                        cost += 2000
+                    }
                     _ => cost += 1000,
                 }
             }

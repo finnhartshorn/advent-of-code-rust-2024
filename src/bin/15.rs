@@ -1,5 +1,5 @@
-use std::collections::HashSet;
 use advent_of_code::Direction;
+use std::collections::HashSet;
 
 advent_of_code::solution!(15);
 
@@ -29,30 +29,47 @@ impl Robot {
 
 pub fn part_one(input: &str) -> Option<u32> {
     let mut splitter = input.split("\n\n");
-    let mut robot = Robot{x: 0, y: 0};
-    let mut grid: Vec::<Vec<char>> = splitter.next().unwrap().lines().enumerate().map(|(y, line)| {
-        line.chars().enumerate().map(|(x, c)| {
-            if c == '@' {
-                robot = Robot { x: x as u32, y: y as u32 };
-                ' '
-            } else if c == '.' {
-                ' '
-            } else {
-                c
-            }
-        }).collect::<Vec<char>>()
-    }).collect();
-    let directions = splitter.next().unwrap().lines().flat_map(|line| {
-        line.chars().map(|c| {
-            match c {
-                '^' => Direction::Up,
-                'v' => Direction::Down,
-                '<' => Direction::Left,
-                '>' => Direction::Right,
-                _ => panic!("Invalid direction"),
-            }
-        }).collect::<Vec<Direction>>()
-    }).collect::<Vec<Direction>>();
+    let mut robot = Robot { x: 0, y: 0 };
+    let mut grid: Vec<Vec<char>> = splitter
+        .next()
+        .unwrap()
+        .lines()
+        .enumerate()
+        .map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .map(|(x, c)| {
+                    if c == '@' {
+                        robot = Robot {
+                            x: x as u32,
+                            y: y as u32,
+                        };
+                        ' '
+                    } else if c == '.' {
+                        ' '
+                    } else {
+                        c
+                    }
+                })
+                .collect::<Vec<char>>()
+        })
+        .collect();
+    let directions = splitter
+        .next()
+        .unwrap()
+        .lines()
+        .flat_map(|line| {
+            line.chars()
+                .map(|c| match c {
+                    '^' => Direction::Up,
+                    'v' => Direction::Down,
+                    '<' => Direction::Left,
+                    '>' => Direction::Right,
+                    _ => panic!("Invalid direction"),
+                })
+                .collect::<Vec<Direction>>()
+        })
+        .collect::<Vec<Direction>>();
 
     directions.iter().for_each(|direction| {
         let next_pos = robot.get_next_pos(direction);
@@ -65,25 +82,37 @@ pub fn part_one(input: &str) -> Option<u32> {
                     grid[next_pos.1 as usize][next_pos.0 as usize] = ' ';
                     grid[next_open_spot.1 as usize][next_open_spot.0 as usize] = 'O';
                 }
-            },
+            }
             _ => panic!("Invalid character"),
         }
     });
 
-    Some(grid.iter().enumerate().map(|(y, line)| {
-        line.iter().enumerate().map(|(x, c)| {
-            if *c == 'O' {
-                let x = x as u32;
-                let y = y as u32;
-                y * 100 + x
-            } else {
-                0
-            }
-        }).sum::<u32>()
-    }).sum::<u32>())
+    Some(
+        grid.iter()
+            .enumerate()
+            .map(|(y, line)| {
+                line.iter()
+                    .enumerate()
+                    .map(|(x, c)| {
+                        if *c == 'O' {
+                            let x = x as u32;
+                            let y = y as u32;
+                            y * 100 + x
+                        } else {
+                            0
+                        }
+                    })
+                    .sum::<u32>()
+            })
+            .sum::<u32>(),
+    )
 }
 
-fn find_next_open_spot(grid: &[Vec<char>], coord: (u32, u32), direction: &Direction) -> Option<(u32, u32)> {
+fn find_next_open_spot(
+    grid: &[Vec<char>],
+    coord: (u32, u32),
+    direction: &Direction,
+) -> Option<(u32, u32)> {
     let mut next_pos = coord;
     loop {
         next_pos = match direction {
@@ -98,82 +127,106 @@ fn find_next_open_spot(grid: &[Vec<char>], coord: (u32, u32), direction: &Direct
             ' ' => return Some(next_pos),
             _ => {
                 panic!("Invalid character")
-            },
+            }
         }
     }
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
     let mut splitter = input.split("\n\n");
-    let mut robot = Robot{x: 0, y: 0};
-    let mut grid: Vec::<Vec<char>> = splitter.next().unwrap().lines().enumerate().map(|(y, line)| {
-        line.chars().enumerate().flat_map(|(x, c)| {
-            match c {
-                '@' => {
-                    robot = Robot { x: (x*2) as u32, y: y as u32 };
-                    [' ',' ']
-                }
-                '.' => [' ',' '],
-                'O' => ['[',']'],
-                '#' => ['#','#'],
-                _ => panic!("Invalid character"),
-            }
-        }).collect::<Vec<char>>()
-    }).collect();
-    let directions = splitter.next().unwrap().lines().flat_map(|line| {
-        line.chars().map(|c| {
-            match c {
-                '^' => Direction::Up,
-                'v' => Direction::Down,
-                '<' => Direction::Left,
-                '>' => Direction::Right,
-                _ => panic!("Invalid direction"),
-            }
-        }).collect::<Vec<Direction>>()
-    }).collect::<Vec<Direction>>();
+    let mut robot = Robot { x: 0, y: 0 };
+    let mut grid: Vec<Vec<char>> = splitter
+        .next()
+        .unwrap()
+        .lines()
+        .enumerate()
+        .map(|(y, line)| {
+            line.chars()
+                .enumerate()
+                .flat_map(|(x, c)| match c {
+                    '@' => {
+                        robot = Robot {
+                            x: (x * 2) as u32,
+                            y: y as u32,
+                        };
+                        [' ', ' ']
+                    }
+                    '.' => [' ', ' '],
+                    'O' => ['[', ']'],
+                    '#' => ['#', '#'],
+                    _ => panic!("Invalid character"),
+                })
+                .collect::<Vec<char>>()
+        })
+        .collect();
+    let directions = splitter
+        .next()
+        .unwrap()
+        .lines()
+        .flat_map(|line| {
+            line.chars()
+                .map(|c| match c {
+                    '^' => Direction::Up,
+                    'v' => Direction::Down,
+                    '<' => Direction::Left,
+                    '>' => Direction::Right,
+                    _ => panic!("Invalid direction"),
+                })
+                .collect::<Vec<Direction>>()
+        })
+        .collect::<Vec<Direction>>();
 
     directions.iter().for_each(|direction| {
         let next_pos = robot.get_next_pos(direction);
         match grid[next_pos.1 as usize][next_pos.0 as usize] {
             ' ' => robot._move(direction),
             '#' => (),
-            '[' | ']' => {
-                match direction {
-                    Direction::Up | Direction::Down => {
-                        if attempt_move_boxes_vertically(&mut grid, (robot.x, robot.y), direction) {
-                            robot._move(direction);
-                        }
-                    },
-                    Direction::Left | Direction::Right => {
-                        if find_next_open_spot(&grid, next_pos, direction).is_some() {
-                            robot._move(direction);
-                            shift_boxes_horizontally(&mut grid, (robot.x, robot.y), direction);
-                        }
-                    },
+            '[' | ']' => match direction {
+                Direction::Up | Direction::Down => {
+                    if attempt_move_boxes_vertically(&mut grid, (robot.x, robot.y), direction) {
+                        robot._move(direction);
+                    }
+                }
+                Direction::Left | Direction::Right => {
+                    if find_next_open_spot(&grid, next_pos, direction).is_some() {
+                        robot._move(direction);
+                        shift_boxes_horizontally(&mut grid, (robot.x, robot.y), direction);
+                    }
                 }
             },
             _ => panic!("Invalid character"),
         }
     });
 
-
     // draw_grid(&grid, (robot.x, robot.y));
 
-    Some(grid.iter().enumerate().map(|(y, line)| {
-        line.iter().enumerate().map(|(x, c)| {
-            if *c == '[' {
-                let x = x as u32;
-                let y = y as u32;
-                y * 100 + x
-            } else {
-                0
-            }
-        }).sum::<u32>()
-    }).sum::<u32>())
+    Some(
+        grid.iter()
+            .enumerate()
+            .map(|(y, line)| {
+                line.iter()
+                    .enumerate()
+                    .map(|(x, c)| {
+                        if *c == '[' {
+                            let x = x as u32;
+                            let y = y as u32;
+                            y * 100 + x
+                        } else {
+                            0
+                        }
+                    })
+                    .sum::<u32>()
+            })
+            .sum::<u32>(),
+    )
 }
 
 // Assumes robot coord is passed in not box coord
-fn attempt_move_boxes_vertically(grid: &mut [Vec<char>], coord: (u32, u32), direction: &Direction) -> bool {
+fn attempt_move_boxes_vertically(
+    grid: &mut [Vec<char>],
+    coord: (u32, u32),
+    direction: &Direction,
+) -> bool {
     let delta: i32 = match direction {
         Direction::Up => -1,
         Direction::Down => 1,
@@ -189,25 +242,33 @@ fn attempt_move_boxes_vertically(grid: &mut [Vec<char>], coord: (u32, u32), dire
                 ' ' => continue,
                 '#' => return false,
                 '[' => {
-                    if handled_box_coords.insert((next_coord.0, (next_coord.1 as i32 + delta) as u32)) {
+                    if handled_box_coords
+                        .insert((next_coord.0, (next_coord.1 as i32 + delta) as u32))
+                    {
                         new_frontier.push((next_coord.0, (next_coord.1 as i32 + delta) as u32));
                         box_stack.push((next_coord.0, (next_coord.1 as i32 + delta) as u32));
                     }
-                    if handled_box_coords.insert((next_coord.0 + 1, (next_coord.1 as i32 + delta) as u32)) {
+                    if handled_box_coords
+                        .insert((next_coord.0 + 1, (next_coord.1 as i32 + delta) as u32))
+                    {
                         new_frontier.push((next_coord.0 + 1, (next_coord.1 as i32 + delta) as u32));
                         box_stack.push((next_coord.0 + 1, (next_coord.1 as i32 + delta) as u32));
                     }
-                },
+                }
                 ']' => {
-                    if handled_box_coords.insert((next_coord.0, (next_coord.1 as i32 + delta) as u32)) {
+                    if handled_box_coords
+                        .insert((next_coord.0, (next_coord.1 as i32 + delta) as u32))
+                    {
                         new_frontier.push((next_coord.0, (next_coord.1 as i32 + delta) as u32));
                         box_stack.push((next_coord.0, (next_coord.1 as i32 + delta) as u32));
                     }
-                    if handled_box_coords.insert((next_coord.0 - 1, (next_coord.1 as i32 + delta) as u32)) {
+                    if handled_box_coords
+                        .insert((next_coord.0 - 1, (next_coord.1 as i32 + delta) as u32))
+                    {
                         new_frontier.push((next_coord.0 - 1, (next_coord.1 as i32 + delta) as u32));
                         box_stack.push((next_coord.0 - 1, (next_coord.1 as i32 + delta) as u32));
                     }
-                },
+                }
                 _ => panic!("Invalid character"),
             }
         }
@@ -215,7 +276,8 @@ fn attempt_move_boxes_vertically(grid: &mut [Vec<char>], coord: (u32, u32), dire
     }
 
     while let Some(_box) = box_stack.pop() {
-        grid[(_box.1 as i32 + delta) as usize][_box.0 as usize] = grid[_box.1 as usize][_box.0 as usize];
+        grid[(_box.1 as i32 + delta) as usize][_box.0 as usize] =
+            grid[_box.1 as usize][_box.0 as usize];
         grid[_box.1 as usize][_box.0 as usize] = ' ';
     }
 
@@ -225,8 +287,8 @@ fn attempt_move_boxes_vertically(grid: &mut [Vec<char>], coord: (u32, u32), dire
 // Assumes boxes can be moved (will not hit a wall)
 fn shift_boxes_horizontally(grid: &mut [Vec<char>], coord: (u32, u32), direction: &Direction) {
     let (delta, end_char) = match direction {
-        Direction::Left => (-1,'['),
-        Direction::Right => (1,']'),
+        Direction::Left => (-1, '['),
+        Direction::Right => (1, ']'),
         _ => panic!("Invalid direction"),
     };
     let mut next_pos = (coord.0 as i32 + delta, coord.1 as i32);
@@ -236,7 +298,7 @@ fn shift_boxes_horizontally(grid: &mut [Vec<char>], coord: (u32, u32), direction
                 grid[next_pos.1 as usize][next_pos.0 as usize] = end_char;
                 grid[coord.1 as usize][coord.0 as usize] = ' ';
                 return;
-            },
+            }
             '[' => grid[next_pos.1 as usize][next_pos.0 as usize] = ']',
             ']' => grid[next_pos.1 as usize][next_pos.0 as usize] = '[',
             _ => panic!("Invalid character"),
