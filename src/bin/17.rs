@@ -4,11 +4,35 @@ advent_of_code::solution!(17);
 
 pub fn part_one(input: &str) -> Option<String> {
     let mut splitter = input.lines();
-    let mut register_a = splitter.next().unwrap().strip_prefix("Register A: ").unwrap().parse::<usize>().unwrap();
-    let mut register_b = splitter.next().unwrap().strip_prefix("Register B: ").unwrap().parse::<usize>().unwrap();
-    let mut register_c = splitter.next().unwrap().strip_prefix("Register C: ").unwrap().parse::<usize>().unwrap();
+    let mut register_a = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register A: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let mut register_b = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register B: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let mut register_c = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register C: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
     splitter.next().unwrap(); // Skip empty line
-    let mut instructions = splitter.next().unwrap().strip_prefix("Program: ").unwrap().split(",").map(|c| c.parse::<usize>().unwrap())
+    let mut instructions = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Program: ")
+        .unwrap()
+        .split(",")
+        .map(|c| c.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
 
     let mut output = Vec::new();
@@ -16,7 +40,7 @@ pub fn part_one(input: &str) -> Option<String> {
     let mut i = 0;
     while i < instructions.len() {
         let instruction = instructions[i];
-        let literal_operand = instructions[i+1];
+        let literal_operand = instructions[i + 1];
         let combo_operand = match literal_operand {
             1 => 1,
             2 => 2,
@@ -49,9 +73,7 @@ pub fn part_one(input: &str) -> Option<String> {
             4 => {
                 register_b = register_b ^ register_c;
             }
-            5 => {
-                output.push(combo_operand % 8)
-            }
+            5 => output.push(combo_operand % 8),
             6 => {
                 register_b = register_a / 2_usize.pow(combo_operand as u32);
             }
@@ -68,11 +90,35 @@ pub fn part_one(input: &str) -> Option<String> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut splitter = input.lines();
-    let mut register_a = splitter.next().unwrap().strip_prefix("Register A: ").unwrap().parse::<usize>().unwrap();
-    let mut register_b = splitter.next().unwrap().strip_prefix("Register B: ").unwrap().parse::<usize>().unwrap();
-    let mut register_c = splitter.next().unwrap().strip_prefix("Register C: ").unwrap().parse::<usize>().unwrap();
+    let mut register_a = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register A: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let mut register_b = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register B: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+    let mut register_c = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Register C: ")
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
     splitter.next().unwrap(); // Skip empty line
-    let mut instructions = splitter.next().unwrap().strip_prefix("Program: ").unwrap().split(",").map(|c| c.parse::<usize>().unwrap())
+    let mut instructions = splitter
+        .next()
+        .unwrap()
+        .strip_prefix("Program: ")
+        .unwrap()
+        .split(",")
+        .map(|c| c.parse::<usize>().unwrap())
         .collect::<Vec<usize>>();
 
     let mut j = 0;
@@ -118,9 +164,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 4 => {
                     register_b = register_b ^ register_c;
                 }
-                5 => {
-                    output.push(combo_operand % 8)
-                }
+                5 => output.push(combo_operand % 8),
                 6 => {
                     register_b = register_a / 2_usize.pow(combo_operand as u32);
                 }
@@ -133,7 +177,13 @@ pub fn part_two(input: &str) -> Option<u64> {
             i += 2;
         }
 
-        let common_suffix = instructions.clone().iter().rev().zip(output.clone().iter().rev()) .take_while(|(x, y)| **x == **y) .count();
+        let common_suffix = instructions
+            .clone()
+            .iter()
+            .rev()
+            .zip(output.clone().iter().rev())
+            .take_while(|(x, y)| **x == **y)
+            .count();
 
         if common_suffix > matched {
             matched = common_suffix;
