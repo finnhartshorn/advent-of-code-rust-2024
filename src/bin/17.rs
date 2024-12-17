@@ -26,7 +26,7 @@ pub fn part_one(input: &str) -> Option<String> {
         .parse::<usize>()
         .unwrap();
     splitter.next().unwrap(); // Skip empty line
-    let mut instructions = splitter
+    let instructions = splitter
         .next()
         .unwrap()
         .strip_prefix("Program: ")
@@ -56,10 +56,10 @@ pub fn part_one(input: &str) -> Option<String> {
 
         match instruction {
             0 => {
-                register_a = register_a / 2_usize.pow(combo_operand as u32);
+                register_a /= 2_usize.pow(combo_operand as u32);
             }
             1 => {
-                register_b = register_b ^ literal_operand;
+                register_b ^= literal_operand;
             }
             2 => {
                 register_b = combo_operand % 8;
@@ -71,7 +71,7 @@ pub fn part_one(input: &str) -> Option<String> {
                 }
             }
             4 => {
-                register_b = register_b ^ register_c;
+                register_b ^= register_c;
             }
             5 => output.push(combo_operand % 8),
             6 => {
@@ -90,13 +90,7 @@ pub fn part_one(input: &str) -> Option<String> {
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut splitter = input.lines();
-    let mut register_a = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Register A: ")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
+    splitter.next().unwrap(); // Skip Register A line
     let mut register_b = splitter
         .next()
         .unwrap()
@@ -112,7 +106,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         .parse::<usize>()
         .unwrap();
     splitter.next().unwrap(); // Skip empty line
-    let mut instructions = splitter
+    let instructions = splitter
         .next()
         .unwrap()
         .strip_prefix("Program: ")
@@ -128,7 +122,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     loop {
         let mut i = 0;
         let mut output = Vec::new();
-        register_a = j;
+        let mut register_a = j;
         while i < instructions.len() {
             let instruction = instructions[i];
             let literal_operand = instructions[i + 1];
@@ -147,10 +141,10 @@ pub fn part_two(input: &str) -> Option<u64> {
 
             match instruction {
                 0 => {
-                    register_a = register_a / 2_usize.pow(combo_operand as u32);
+                    register_a /= 2_usize.pow(combo_operand as u32);
                 }
                 1 => {
-                    register_b = register_b ^ literal_operand;
+                    register_b ^= literal_operand;
                 }
                 2 => {
                     register_b = combo_operand % 8;
@@ -162,7 +156,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     }
                 }
                 4 => {
-                    register_b = register_b ^ register_c;
+                    register_b ^= register_c;
                 }
                 5 => output.push(combo_operand % 8),
                 6 => {
