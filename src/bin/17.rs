@@ -4,192 +4,73 @@ advent_of_code::solution!(17);
 
 pub fn part_one(input: &str) -> Option<String> {
     let mut splitter = input.lines();
-    let mut register_a = splitter
+    let register_a = splitter
         .next()
         .unwrap()
         .strip_prefix("Register A: ")
         .unwrap()
         .parse::<usize>()
         .unwrap();
-    let mut register_b = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Register B: ")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
-    let mut register_c = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Register C: ")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
-    splitter.next().unwrap(); // Skip empty line
-    let instructions = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Program: ")
-        .unwrap()
-        .split(",")
-        .map(|c| c.parse::<usize>().unwrap())
-        .collect::<Vec<usize>>();
 
-    let mut output = Vec::new();
+    let output = program_iter(register_a);
 
-    let mut i = 0;
-    while i < instructions.len() {
-        let instruction = instructions[i];
-        let literal_operand = instructions[i + 1];
-        let combo_operand = match literal_operand {
-            1 => 1,
-            2 => 2,
-            3 => 3,
-            4 => register_a,
-            5 => register_b,
-            6 => register_c,
-            7 => 7,
-            8 => 8,
-            0 => 9,
-            _ => panic!("Invalid operand"),
-        };
-
-        match instruction {
-            0 => {
-                register_a /= 2_usize.pow(combo_operand as u32);
-            }
-            1 => {
-                register_b ^= literal_operand;
-            }
-            2 => {
-                register_b = combo_operand % 8;
-            }
-            3 => {
-                if register_a != 0 {
-                    i = literal_operand;
-                    continue;
-                }
-            }
-            4 => {
-                register_b ^= register_c;
-            }
-            5 => output.push(combo_operand % 8),
-            6 => {
-                register_b = register_a / 2_usize.pow(combo_operand as u32);
-            }
-            7 => {
-                register_c = register_a / 2_usize.pow(combo_operand as u32);
-            }
-            _ => {}
-        }
-
-        i += 2;
-    }
     Some(output.into_iter().join(","))
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
     let mut splitter = input.lines();
     splitter.next().unwrap(); // Skip Register A line
-    let mut register_b = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Register B: ")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
-    let mut register_c = splitter
-        .next()
-        .unwrap()
-        .strip_prefix("Register C: ")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
+    splitter.next().unwrap(); // Skip Register B line
+    splitter.next().unwrap(); // Skip Register C line
     splitter.next().unwrap(); // Skip empty line
+
     let instructions = splitter
         .next()
         .unwrap()
         .strip_prefix("Program: ")
         .unwrap()
         .split(",")
-        .map(|c| c.parse::<usize>().unwrap())
-        .collect::<Vec<usize>>();
+        .map(|c| c.parse::<u8>().unwrap())
+        .collect::<Vec<u8>>();
 
     let mut j = 0;
 
     let mut matched = 0;
 
     loop {
-        let mut i = 0;
-        let mut output = Vec::new();
-        let mut register_a = j;
-        while i < instructions.len() {
-            let instruction = instructions[i];
-            let literal_operand = instructions[i + 1];
-            let combo_operand = match literal_operand {
-                1 => 1,
-                2 => 2,
-                3 => 3,
-                4 => register_a,
-                5 => register_b,
-                6 => register_c,
-                7 => 7,
-                8 => 8,
-                0 => 9,
-                _ => panic!("Invalid operand"),
-            };
-
-            match instruction {
-                0 => {
-                    register_a /= 2_usize.pow(combo_operand as u32);
-                }
-                1 => {
-                    register_b ^= literal_operand;
-                }
-                2 => {
-                    register_b = combo_operand % 8;
-                }
-                3 => {
-                    if register_a != 0 {
-                        i = literal_operand;
-                        continue;
-                    }
-                }
-                4 => {
-                    register_b ^= register_c;
-                }
-                5 => output.push(combo_operand % 8),
-                6 => {
-                    register_b = register_a / 2_usize.pow(combo_operand as u32);
-                }
-                7 => {
-                    register_c = register_a / 2_usize.pow(combo_operand as u32);
-                }
-                _ => {}
-            }
-
-            i += 2;
-        }
-
-        let common_suffix = instructions
-            .clone()
-            .iter()
-            .rev()
-            .zip(output.clone().iter().rev())
-            .take_while(|(x, y)| **x == **y)
-            .count();
-
-        if common_suffix > matched {
-            matched = common_suffix;
-            if common_suffix == instructions.len() {
+        if single_run(j) == instructions[instructions.len() - (matched + 1)] {
+            matched += 1;
+            if matched == instructions.len() {
                 return Some(j as u64);
             }
             j *= 8;
-            continue;
+        } else {
+            j += 1;
         }
-
-        j += 1;
     }
+}
+
+fn program_iter(init_a: usize) -> Vec<u8> {
+    let mut i = 0;
+    let mut a = init_a;
+    while a > 0 {
+        a >>= 3;
+        i += 1;
+    }
+    (0..i)
+        .scan(init_a, |state, _| {
+            let b = (*state % 8) ^ 2;
+            let c = *state >> b;
+            *state >>= 3;
+            Some(((b ^ 7 ^ c) % 8) as u8)
+        })
+        .collect()
+}
+
+fn single_run(init_a: usize) -> u8 {
+    let b = (init_a % 8) ^ 2;
+    let c = init_a >> b;
+    ((b ^ 7 ^ c) % 8) as u8
 }
 
 #[cfg(test)]
