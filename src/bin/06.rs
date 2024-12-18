@@ -1,15 +1,7 @@
-use itertools::iproduct;
 use std::cmp::PartialEq;
 use std::collections::HashSet;
 
 advent_of_code::solution!(6);
-
-#[derive(PartialEq, Clone, Debug)]
-enum Status {
-    Empty,
-    Visited,
-    Obstacle,
-}
 
 #[derive(PartialEq, Eq, Hash, Clone, Debug)]
 enum Direction {
@@ -88,18 +80,17 @@ impl Guard {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let mut grid: Vec<Vec<Status>> = vec![];
+    let mut grid: Vec<Vec<bool>> = vec![];
     let mut guard = Guard::new();
-    let mut sum = 1;
     for (y, line) in input.lines().enumerate() {
         let mut row = vec![];
         for (x, c) in line.chars().enumerate() {
             let status = match c {
-                '.' => Status::Empty,
-                '#' => Status::Obstacle,
+                '.' => false,
+                '#' => true,
                 '^' => {
                     guard.pos = (x, y);
-                    Status::Visited
+                    false
                 }
                 _ => panic!("Invalid character"),
             };
@@ -107,33 +98,37 @@ pub fn part_one(input: &str) -> Option<u32> {
         }
         grid.push(row);
     }
+
+    let mut visited = HashSet::<(usize, usize)>::new();
+    visited.insert(guard.pos);
+
     while let Some(next_pos) = guard.next_pos(grid[0].len() - 1, grid.len() - 1) {
         let (nx, ny) = next_pos;
-        if grid[ny][nx] == Status::Obstacle {
+        if grid[ny][nx] {
             guard.turn();
             continue;
         }
         guard.move_forward();
-        if grid[ny][nx] == Status::Empty {
-            grid[ny][nx] = Status::Visited;
-            sum += 1;
+        if !visited.contains(&(nx, ny)) {
+            visited.insert((nx, ny));
+            continue;
         }
     }
-    Some(sum)
+    Some(visited.len() as u32)
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    let mut grid: Vec<Vec<Status>> = vec![];
+    let mut grid: Vec<Vec<bool>> = vec![];
     let mut guard = Guard::new();
     for (y, line) in input.lines().enumerate() {
         let mut row = vec![];
         for (x, c) in line.chars().enumerate() {
             let status = match c {
-                '.' => Status::Empty,
-                '#' => Status::Obstacle,
+                '.' => false,
+                '#' => true,
                 '^' => {
                     guard.pos = (x, y);
-                    Status::Visited
+                    false
                 }
                 _ => panic!("Invalid character"),
             };
@@ -141,45 +136,68 @@ pub fn part_two(input: &str) -> Option<u32> {
         }
         grid.push(row);
     }
-    Some(
-        iproduct!(0..grid.len(), 0..grid[0].len())
-            .filter_map(|(oy, ox)| {
-                let mut seen_position_directions = HashSet::<(usize, usize, Direction)>::new();
-                let mut inner_guard = guard.clone();
-                let mut inner_grid = grid.clone();
-                match grid[oy][ox] {
-                    Status::Empty => (inner_grid[oy][ox] = Status::Obstacle,),
-                    Status::Obstacle => return None,
-                    Status::Visited => return None,
-                };
-                while let Some(next_pos) =
-                    inner_guard.next_pos(inner_grid[0].len() - 1, inner_grid.len() - 1)
-                {
-                    let (nx, ny) = next_pos;
-                    if inner_grid[ny][nx] == Status::Obstacle {
-                        inner_guard.turn();
-                        continue;
-                    }
-                    inner_guard.move_forward();
-                    if inner_grid[ny][nx] == Status::Empty {
-                        inner_grid[ny][nx] = Status::Visited;
-                        seen_position_directions.insert((
-                            inner_guard.pos.0,
-                            inner_guard.pos.1,
-                            inner_guard.direction.clone(),
-                        ));
-                    } else if seen_position_directions.contains(&(
-                        inner_guard.pos.0,
-                        inner_guard.pos.1,
-                        inner_guard.direction.clone(),
-                    )) {
-                        return Some(());
-                    }
-                }
-                None
-            })
-            .count() as u32,
-    )
+
+    // Simulate the path once so we know possible positions for obstructions
+    let mut visited = HashSet::<(usize, usize)>::new();
+    visited.insert(guard.pos);
+
+    let mut visited_guard = guard.clone();
+
+    while let Some(next_pos) = visited_guard.next_pos(grid[0].len() - 1, grid.len() - 1) {
+        let (nx, ny) = next_pos;
+        if grid[ny][nx] {
+            visited_guard.turn();
+            continue;
+        }
+        visited_guard.move_forward();
+        if !visited.contains(&(nx, ny)) {
+            visited.insert((nx, ny));
+            continue;
+        }
+    }
+
+    visited.remove(&guard.pos);
+
+    let mut sum = 0;
+
+    visited.iter().for_each(|(ox, oy)| {
+        let mut seen_position_directions = HashSet::<(usize, usize, Direction)>::new();
+        let mut inner_guard = guard.clone();
+        grid[*oy][*ox] = true;
+        while let Some(next_pos) =
+            inner_guard.next_pos(grid[0].len() - 1, grid.len() - 1)
+        {
+            let (nx, ny) = next_pos;
+            if grid[ny][nx] {
+                inner_guard.turn();
+                continue;
+            }
+            inner_guard.move_forward();
+            if !grid[ny][nx]
+                && !seen_position_directions.contains(&(
+                    inner_guard.pos.0,
+                    inner_guard.pos.1,
+                    inner_guard.direction.clone(),
+                ))
+            {
+                seen_position_directions.insert((
+                    inner_guard.pos.0,
+                    inner_guard.pos.1,
+                    inner_guard.direction.clone(),
+                ));
+            } else if seen_position_directions.contains(&(
+                inner_guard.pos.0,
+                inner_guard.pos.1,
+                inner_guard.direction.clone(),
+            )) {
+                grid[*oy][*ox] = false;
+                sum += 1;
+                return;
+            }
+        }
+        grid[*oy][*ox] = false;
+    });
+    Some(sum)
 }
 
 #[cfg(test)]
