@@ -148,9 +148,12 @@ pub fn part_two(input: &str) -> Option<u32> {
             visited_guard.turn();
             continue;
         }
-        visited.push((visited_guard.pos.0, visited_guard.pos.1, visited_guard.direction.clone()));
+        visited.push((
+            visited_guard.pos.0,
+            visited_guard.pos.1,
+            visited_guard.direction.clone(),
+        ));
         visited_guard.move_forward();
-
     }
 
     let mut placed_obstacles = HashSet::<(usize, usize)>::new();
@@ -171,9 +174,7 @@ pub fn part_two(input: &str) -> Option<u32> {
         }
         grid[obstacle_pos.1][obstacle_pos.0] = true;
         placed_obstacles.insert(obstacle_pos);
-        while let Some(next_pos) =
-            inner_guard.next_pos(grid[0].len() - 1, grid.len() - 1)
-        {
+        while let Some(next_pos) = inner_guard.next_pos(grid[0].len() - 1, grid.len() - 1) {
             let (nx, ny) = next_pos;
             if grid[ny][nx] {
                 inner_guard.turn();
