@@ -138,8 +138,7 @@ pub fn part_two(input: &str) -> Option<u32> {
     }
 
     // Simulate the path once so we know possible positions for obstructions
-    let mut visited = HashSet::<(usize, usize)>::new();
-    visited.insert(guard.pos);
+    let mut visited = Vec::new();
 
     let mut visited_guard = guard.clone();
 
@@ -149,21 +148,29 @@ pub fn part_two(input: &str) -> Option<u32> {
             visited_guard.turn();
             continue;
         }
+        visited.push((visited_guard.pos.0, visited_guard.pos.1, visited_guard.direction.clone()));
         visited_guard.move_forward();
-        if !visited.contains(&(nx, ny)) {
-            visited.insert((nx, ny));
-            continue;
-        }
+
     }
 
-    visited.remove(&guard.pos);
+    let mut placed_obstacles = HashSet::<(usize, usize)>::new();
 
     let mut sum = 0;
 
-    visited.iter().for_each(|(ox, oy)| {
+    visited.iter().for_each(|(ox, oy, direction)| {
         let mut seen_position_directions = HashSet::<(usize, usize, Direction)>::new();
-        let mut inner_guard = guard.clone();
-        grid[*oy][*ox] = true;
+        let mut inner_guard = Guard {
+            pos: (*ox, *oy),
+            direction: direction.clone(),
+        };
+        let Some(obstacle_pos) = inner_guard.next_pos(grid[0].len() - 1, grid.len() - 1) else {
+            return;
+        };
+        if placed_obstacles.contains(&obstacle_pos) {
+            return;
+        }
+        grid[obstacle_pos.1][obstacle_pos.0] = true;
+        placed_obstacles.insert(obstacle_pos);
         while let Some(next_pos) =
             inner_guard.next_pos(grid[0].len() - 1, grid.len() - 1)
         {
@@ -190,12 +197,12 @@ pub fn part_two(input: &str) -> Option<u32> {
                 inner_guard.pos.1,
                 inner_guard.direction.clone(),
             )) {
-                grid[*oy][*ox] = false;
+                grid[obstacle_pos.1][obstacle_pos.0] = false;
                 sum += 1;
                 return;
             }
         }
-        grid[*oy][*ox] = false;
+        grid[obstacle_pos.1][obstacle_pos.0] = false;
     });
     Some(sum)
 }
