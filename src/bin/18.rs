@@ -1,9 +1,8 @@
+use advent_of_code::get_cardinal_directions;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashSet};
-use advent_of_code::get_cardinal_directions;
 
 advent_of_code::solution!(18);
-
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -28,18 +27,16 @@ struct Node {
 }
 
 pub fn part_one(input: &str) -> Option<u32> {
-    let coords= input.lines().map(|line| {
+    let coords = input.lines().map(|line| {
         let mut splitter = line.split(',');
         let x = splitter.next().unwrap().parse::<usize>().unwrap();
         let y = splitter.next().unwrap().parse::<usize>().unwrap();
         (x, y)
     });
 
-    let mut grid: Vec::<Vec<bool>> = (0..=70).map(|_| {
-        (0..=70).map(|_| {
-            false
-        }).collect()
-    }).collect();
+    let mut grid: Vec<Vec<bool>> = (0..=70)
+        .map(|_| (0..=70).map(|_| false).collect())
+        .collect();
 
     let n = 1024;
 
@@ -50,7 +47,11 @@ pub fn part_one(input: &str) -> Option<u32> {
     let mut heap = BinaryHeap::new();
     let mut visited = HashSet::new();
 
-    heap.push(Node { x: 0, y: 0, cost: 0 });
+    heap.push(Node {
+        x: 0,
+        y: 0,
+        cost: 0,
+    });
 
     while let Some(node) = heap.pop() {
         if node.x == 70 && node.y == 70 {
@@ -76,23 +77,21 @@ pub fn part_one(input: &str) -> Option<u32> {
         }
     }
 
-
     None
 }
 
+// TODO: Test binary search + floodfill
 pub fn part_two(input: &str) -> Option<String> {
-    let mut coords= input.lines().map(|line| {
+    let mut coords = input.lines().map(|line| {
         let mut splitter = line.split(',');
         let x = splitter.next().unwrap().parse::<usize>().unwrap();
         let y = splitter.next().unwrap().parse::<usize>().unwrap();
         (x, y)
     });
 
-    let mut grid: Vec::<Vec<bool>> = (0..=70).map(|_| {
-        (0..=70).map(|_| {
-            false
-        }).collect()
-    }).collect();
+    let mut grid: Vec<Vec<bool>> = (0..=70)
+        .map(|_| (0..=70).map(|_| false).collect())
+        .collect();
 
     for _ in 0..=1024 {
         if let Some((x, y)) = coords.next() {
@@ -117,10 +116,14 @@ pub fn part_two(input: &str) -> Option<String> {
     Some(format!("{},{}", last_coord.0, last_coord.1))
 }
 
-fn grid_solvable(grid: &[Vec<bool>]) -> Option<HashSet::<(usize, usize)>> {
+fn grid_solvable(grid: &[Vec<bool>]) -> Option<HashSet<(usize, usize)>> {
     let mut heap = BinaryHeap::new();
     let mut visited = HashSet::new();
-    heap.push(Node { x: 0, y: 0, cost: 0 });
+    heap.push(Node {
+        x: 0,
+        y: 0,
+        cost: 0,
+    });
 
     while let Some(node) = heap.pop() {
         if node.x == 70 && node.y == 70 {
